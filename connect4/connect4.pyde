@@ -15,6 +15,7 @@ class Board:
         self.y = y
         self.w = w
         self.h = h
+        self.plays = []
 
     def display(self):
         noStroke()
@@ -53,6 +54,7 @@ class Board:
                 for row in range(len(self.spots))[::-1]:
                     if self.spots[row][col] is None:
                         self.spots[row][col] = player
+                        self.plays.append((row, col))
                         return (row, col)
 
     def __getCellWidth(self):
@@ -146,6 +148,12 @@ class Game:
             self.puckX = mouseX
         circle(self.puckX, 0,PUCKSIZE)
 
+    def undoPlay(self):
+        if len(self.board.plays) > 0:
+            previous = self.board.plays.pop()
+            self.board.spots[previous[0]][previous[1]] = None
+            self.turn *= -1
+
     def play(self):
         # Make sure move is valid
         if self.board.isValidPlay(self.puckX) and not self.over:
@@ -185,6 +193,8 @@ def keyPressed():
     global game
     if key == 'q':
         exit()
+    if key == 'u':
+        game.undoPlay()
     if game.over:
         if key in('R', 'r'):
             game = Game(width, height)

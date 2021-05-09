@@ -67,7 +67,8 @@ class Board:
         pr = placement[0]
         pc = placement[1]
         player = self.spots[pr][pc]
-        directions = [(-1,0), (-1,-1), (0,-1), (1,-1)]
+        directions = [(-1, 0), (-1, -1), (0, -1), (1, -1)]
+        wins = []
         for row in range(len(self.spots)):
             for col in range(len(self.spots[row])):
                 if self.spots[row][col] != player:
@@ -75,29 +76,31 @@ class Board:
                 for d in directions:
                     currR = row
                     currC = col
-                    has4 = True
-                    for i in range(4):
+                    consecutive = 0
+                    while True:
                         if (not 0 <= currR < self.rows) or (not 0 <= currC < self.cols):
-                            has4 = False
                             break
-                        has4 = has4 and self.spots[currR][currC] == player
+                        if self.spots[currR][currC] != player:
+                            break
+                        consecutive += 1
                         currR += d[0]
                         currC += d[1]
-                    if has4:
+                    if consecutive > 3:
                         currR -= d[0]
                         currC -= d[1]
-                        return (row, col, currR, currC)
-        return None
+                        wins.append((row, col, currR, currC, consecutive))
+        return wins
 
-    def drawVictoryLine(self, coordinates):
+    def drawVictoryLines(self, coordinateList):
         stroke(50, 210, 70)
         strokeWeight(10)
         cellW = self.__getCellWidth()
         cellH = self.__getCellHeight()
-        line( self.x + coordinates[1] * cellW + cellW / 2,
-              self.y + coordinates[0] * cellH + cellH / 2,
-              self.x + coordinates[3] * cellW + cellW / 2,
-              self.y + coordinates[2] * cellH + cellH / 2)
+        for coordinates in coordinateList:
+            line( self.x + coordinates[1] * cellW + cellW / 2,
+                  self.y + coordinates[0] * cellH + cellH / 2,
+                  self.x + coordinates[3] * cellW + cellW / 2,
+                  self.y + coordinates[2] * cellH + cellH / 2)
 
 class Game:
 
@@ -113,7 +116,7 @@ class Game:
     def display(self):
         self.board.display()
         if self.over:
-            self.board.drawVictoryLine(self.victoryLine)
+            self.board.drawVictoryLines(self.victoryLines)
 
             textAlign(CENTER, CENTER)
             textSize(30)
@@ -153,6 +156,9 @@ class Game:
             previous = self.board.plays.pop()
             self.board.spots[previous[0]][previous[1]] = None
             self.turn *= -1
+            if self.over:
+                self.turn *= -1
+                self.over = False
 
     def play(self):
         # Make sure move is valid
@@ -161,10 +167,10 @@ class Game:
             placement = self.board.placePuck(self.puckX, self.turn)
             #check for win
             result = self.board.checkWin(placement)
-            if result is not None:
+            if len(result) > 0:
                 self.over = True
                 # set victory line coordinates
-                self.victoryLine = result
+                self.victoryLines = result
             else:
                 # update turn
                 self.turn *= -1

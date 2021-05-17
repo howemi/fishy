@@ -108,6 +108,11 @@ class Game:
         self.w = w
         self.h = h
         self.playerSpace = 100
+        self.p1_wins = 0
+        self.p2_wins = 0
+        self.init_game_state()
+
+    def init_game_state(self):
         self.board = Board(0, self.playerSpace, self.w, \
                 self.h - self.playerSpace)
         self.turn = 1
@@ -115,6 +120,7 @@ class Game:
 
     def display(self):
         self.board.display()
+        self.__draw_score()
         if self.over:
             self.board.drawVictoryLines(self.victoryLines)
 
@@ -134,6 +140,12 @@ class Game:
             text(message2, 0, 0, self.w, self.playerSpace)
         else:
             self.__drawPuck()
+
+    def __draw_score(self):
+        textAlign(LEFT, TOP)
+        textSize(15)
+        text('P1 Score: ' + str(self.p1_wins), 10, 10, 200, 25)
+        text('P2 Score: ' + str(self.p2_wins), 10, 30, 200, 45)
 
     def __drawPuck(self):
         # Choose the right color
@@ -171,6 +183,10 @@ class Game:
                 self.over = True
                 # set victory line coordinates
                 self.victoryLines = result
+                if self.turn == 1:
+                    self.p1_wins += 1
+                else:
+                    self.p2_wins += 1
             else:
                 # update turn
                 self.turn *= -1
@@ -203,4 +219,4 @@ def keyPressed():
         game.undoPlay()
     if game.over:
         if key in('R', 'r'):
-            game = Game(width, height)
+            game.init_game_state()

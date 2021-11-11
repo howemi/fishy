@@ -142,6 +142,7 @@ class Game:
             self.__drawPuck()
 
     def __draw_score(self):
+        stroke(0)
         textAlign(LEFT, TOP)
         textSize(15)
         text('P1 Score: ' + str(self.p1_wins), 10, 10, 200, 25)

@@ -162,6 +162,8 @@ class Game:
             self.puckX = PUCKSIZE / 2
         else:
             self.puckX = mouseX
+        stroke(0)
+        strokeWeight(10)
         circle(self.puckX, 0,PUCKSIZE)
 
     def undoPlay(self):

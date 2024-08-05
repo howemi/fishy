@@ -169,7 +169,7 @@ class Game:
                             SCREEN_SIZE / 2 + 50)
                 else:
                     self.player.getPoints(s.size ** 2)
-                    self.player.size += (s.size / 20)
+                    self.player.size += (s.size / 15)
                     remove.add(s)
             if s.offScreen():
                 remove.add(s)
